@@ -1,11 +1,7 @@
-import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../db/db_helper.dart';
-import '../model/usuario.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -22,8 +18,6 @@ class _CadastroPageState extends State<CadastroPage> {
   final senhaController = TextEditingController();
   final confirmarSenhaController = TextEditingController();
 
-  final DBHelper dbHelper = DBHelper();
-
   bool carregando = false;
 
   @override
@@ -36,16 +30,9 @@ class _CadastroPageState extends State<CadastroPage> {
     super.dispose();
   }
 
-  String gerarHash(String senha) {
-    return sha256.convert(
-      utf8.encode(senha),
-    ).toString();
-  }
-
+  
   Future<void> cadastrarUsuario() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       carregando = true;
@@ -56,53 +43,41 @@ class _CadastroPageState extends State<CadastroPage> {
       final email = emailController.text.trim().toLowerCase();
       final senha = senhaController.text;
 
-      final emailExiste = await dbHelper.emailExiste(email);
-
-      if (emailExiste) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Este e-mail já está cadastrado.',
-            ),
-          ),
-        );
-
-        return;
-      }
-
-      final usuario = Usuario(
-        nome: nome,
+      final resposta = await Supabase.instance.client.auth.signUp(
         email: email,
-        senhaHash: gerarHash(senha),
+        password: senha,
+        data: {
+          'nome': nome,
+        },
       );
-
-      await dbHelper.inserirUsuario(usuario);
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Cadastro realizado com sucesso!',
-          ),
-        ),
-      );
+      if (resposta.user != null) {
+        final mensagem = resposta.session == null
+            ? 'Cadastro realizado! Verifique seu e-mail para confirmar a conta.'
+            : 'Cadastro realizado com sucesso!';
 
-      nomeController.clear();
-      emailController.clear();
-      senhaController.clear();
-      confirmarSenhaController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mensagem)),
+        );
+
+        nomeController.clear();
+        emailController.clear();
+        senhaController.clear();
+        confirmarSenhaController.clear();
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro no cadastro: ${e.message}')),
+      );
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erro ao realizar cadastro: $e',
-          ),
-        ),
+        SnackBar(content: Text('Não foi possível realizar o cadastro: $e')),
       );
     } finally {
       if (mounted) {
@@ -112,6 +87,7 @@ class _CadastroPageState extends State<CadastroPage> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

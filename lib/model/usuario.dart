@@ -1,31 +1,30 @@
+
 class Usuario {
-  final int? id;
+  final String id;
   final String nome;
-  final String email;
-  final String senhaHash;
+  final DateTime? criadoEm;
 
   Usuario({
-    this.id,
+    required this.id,
     required this.nome,
-    required this.email,
-    required this.senhaHash,
+    this.criadoEm,
   });
+
+  factory Usuario.fromMap(Map<String, dynamic> map) {
+    return Usuario(
+      id: map['id'] as String,
+      nome: map['nome'] as String,
+      criadoEm: map['criado_em'] == null
+          ? null
+          : DateTime.parse(map['criado_em'] as String),
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nome': nome,
-      'email': email,
-      'senha_hash': senhaHash,
+      'criado_em': criadoEm?.toIso8601String(),
     };
-  }
-
-  factory Usuario.fromMap(Map<String, dynamic> map) {
-    return Usuario(
-      id: map['id'],
-      nome: map['nome'],
-      email: map['email'],
-      senhaHash: map['senha_hash'],
-    );
   }
 }
