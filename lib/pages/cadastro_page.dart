@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'login_page.dart';
+
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -261,30 +263,49 @@ class _CadastroPageState extends State<CadastroPage> {
                   height: 25,
                 ),
 
-                Align(
-                  alignment: Alignment.centerLeft,
+                
+                const SizedBox(height: 25),
 
-                  child: TextButton(
-                    onPressed: () {
-                      // Depois vamos navegar para a tela de login.
-                    },
-
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize:
-                          MaterialTapTargetSize.shrinkWrap,
-                    ),
-
-                    child: Text(
-                      'Já tem conta? Clique aqui',
-
-                      style: GoogleFonts.montserrat(
-                        fontSize: 20,
-                        color: const Color(0xFFBBD6FA),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Já tem uma conta? ',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 20,
+                          color: const Color(0xFFBBD6FA),
+                        ),
                       ),
                     ),
-                  ),
+
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      },
+
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+
+                      child: Text(
+                        'Entrar',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 20,
+                          color: const Color(0xFFBBD6FA),
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(

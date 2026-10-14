@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'pages/cadastro_page.dart';
-
-
+import 'pages/login_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +22,10 @@ class ProntuarioApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Prontuário Médico Único',
-      theme: ThemeData(useMaterial3: true),
-      home: const CadastroPage(),
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
+      home: const LoginPage(),
     );
   }
 }
